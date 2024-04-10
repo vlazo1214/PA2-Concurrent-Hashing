@@ -1,6 +1,6 @@
 // Concurrent Hash Table struct definitions
 
-#include <stdint>
+#include <stdint.h>
 
 typedef struct hash_struct
 {
