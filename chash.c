@@ -10,6 +10,7 @@
 
 #define MAX_COMMAND_SIZE 100
 #define MAX_NAME_SIZE 100
+#define NUM_BUCKETS 13
 
 int main(void)
 {
@@ -24,6 +25,8 @@ int main(void)
         printf("Error opening file\n");
         return 1;
     }
+
+    hashRecord *hashTable[NUM_BUCKETS] = {NULL};
 
     while (1)
     {
@@ -77,7 +80,12 @@ int main(void)
             // Testing
             fprintf(output, "Inserting %s with salary %d\n", name, salary); // Comment this after you implement insert
 
-            // Implement insert  function here
+            // Call insert
+            if (!insert(hashTable, name, salary))
+            {
+                fprintf(output, "Error inserting record\n");
+                return 1;
+            }
         }
         else if (strcmp(token, "delete") == 0)
         {
