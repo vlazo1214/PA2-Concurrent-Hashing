@@ -1,0 +1,12 @@
+Setting number of threads to 11
+Inserting Richard Garriot with salary 40000
+Inserting Sid Meier with salary 50000
+Inserting Shigeru Miyamoto with salary 51000
+Inserting Hideo Kojima with salary 45000
+Inserting Gabe Newell with salary 49000
+Inserting Roberta Williams with salary 45900
+Inserting Carol Shaw with salary 41000
+Printing hash table
+Searching for Shigeru Miyamoto
+Deleting Sid Meier
+Deleting Hideo Kojima
