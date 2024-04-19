@@ -43,3 +43,56 @@ bool insert(hashRecord *hashTable[], const char *name, uint32_t salary) {
     return true;
 }
 
+char* search(hashRecord *hashTable[], const char *name)
+{
+
+    bool key = false; // probably better way to do this but just to set up the code
+    // call hash function to compute the hashvalue of the key
+    // Calculate hash value for the given name
+    uint32_t hash = calculate_hash(name);
+
+    // locate the corresponding node
+
+    // acquire read lock
+    // protect list
+    // search linked list for the key
+
+    // if key is not found: 
+    if (!key)
+    {
+        // probably need fprintf? but also I'd need the file name as a parameter
+        printf("No Record Found");
+        return null;
+
+    }
+
+    // if key is found:
+    if (key)
+    {
+        // print record
+        print(name) // FORMAT LATER WHEN FIGURE OUT FORMATTING
+        // return value
+    }
+    // release read lock and return
+
+}
+
+void delete(hashRecord *hashTable[], const char *name)
+{
+    // call hash function to compute the hashvalue of the key
+
+    // locate the corresponding node
+
+    // acquire write lock
+    // protect list
+    // search linked list for the key
+
+    // if not found: 
+    // do nothing (and return?)
+
+    // if found:
+    // remove node from list
+    // free memory
+
+    // release write lock and return    
+}
