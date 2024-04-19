@@ -5,6 +5,8 @@
 #include <sys/time.h>
 #include <sys/stat.h>
 #include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 double GetTime();
 void Spin(int time);
