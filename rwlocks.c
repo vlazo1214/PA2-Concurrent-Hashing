@@ -1,6 +1,7 @@
 // file implementing read/ write locks
 
 #include "rwlocks.h"
+#include "common.h" 
 
 void rwlock_init(rwlock_t *lock) {
     lock->readers = 0;
