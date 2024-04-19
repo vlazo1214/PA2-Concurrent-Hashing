@@ -1,16 +1,15 @@
 // main file that reads the commands.txt and produces output to the console
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "hashdb.h"
 #include "rwlocks.h"
 #include "common.h"
 #include "common_threads.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #define MAX_COMMAND_SIZE 100
 #define MAX_NAME_SIZE 100
-#define NUM_BUCKETS 13
 
 int main(void)
 {
@@ -26,7 +25,7 @@ int main(void)
         return 1;
     }
 
-    hashRecord *hashTable[NUM_BUCKETS] = {NULL};
+    hashRecord *head;
 
     while (1)
     {
@@ -61,7 +60,6 @@ int main(void)
             // Testing
             fprintf(output, "Setting number of threads to %d\n", salary); // Comment this after you implement threads
 
-            // Implement thread function  here
         }
         else if (strcmp(token, "insert") == 0)
         {
@@ -81,7 +79,7 @@ int main(void)
             fprintf(output, "Inserting %s with salary %d\n", name, salary); // Comment this after you implement insert
 
             // Call insert
-            if (!insert(hashTable, name, salary))
+            if (!insert(head, name, salary))
             {
                 fprintf(output, "Error inserting record\n");
                 return 1;

@@ -22,6 +22,9 @@ typedef struct hash_struct
 
 uint32_t calculate_hash(const char *str);
 
-bool insert(hashRecord *hashTable[], const char *name, uint32_t salary);
+bool insert(hashRecord *head, const char *name, uint32_t salary);
+// bool search(hashRecord *head, uint32_t hash);
+// bool delete(hashRecord *head, uint32_t hash);
+
 
 #endif
