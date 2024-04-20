@@ -221,7 +221,7 @@ bool delete(hashRecord *hashTable, const char *name, FILE * fp)
     if (r->hash == hash)
     {
         hashTable = hashTable->next;
-        fprintf("%s", r->name);
+        fprintf(fp, "%s\n", r->name);
         free(r->name);
         free(r);
         return true;
@@ -238,7 +238,7 @@ bool delete(hashRecord *hashTable, const char *name, FILE * fp)
         {
             // remove record from linked list
             previous->next = r->next;
-            fprintf("%s", r->name);
+            fprintf(fp, "%s\n", r->name);
             // free record memory
             free(r->name);
             free(r);
