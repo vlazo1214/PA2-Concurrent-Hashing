@@ -4,13 +4,22 @@ CC = gcc
 CFLAGS = -Wall -Wextra -pthread
 
 # Source files
-SOURCES = chash.c hashdb.c rwlocks.c
+SOURCES = chash.c hashdb.c
 
 # Object files
 OBJECTS = $(SOURCES:.c=.o)
 
 # Executable name
 EXECUTABLE = chash
+
+# Determine the platform
+ifeq ($(OS),Windows_NT)
+	# If on Windows, set appropriate commands and file extensions
+	RM = del /q
+	EXECUTABLE := $(EXECUTABLE).exe
+else
+	RM = rm -f
+endif
 
 # Default target
 all: $(EXECUTABLE)
@@ -25,5 +34,4 @@ $(EXECUTABLE): $(OBJECTS)
 
 # Clean rule
 clean:
-	rm -f $(EXECUTABLE) $(OBJECTS)
-
+	$(RM) $(EXECUTABLE) $(OBJECTS)
