@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <pthread.h>
 #include "hashdb.h"
 #include "rwlocks.h"
 #include "common.h"
@@ -11,6 +12,8 @@
 #define MAX_COMMAND_SIZE 100
 #define MAX_NAME_SIZE 100
 
+#define DEBUG 1
+
 int main(void)
 {
     FILE *input = fopen("commands.txt", "r");
@@ -18,6 +21,8 @@ int main(void)
     char command[MAX_COMMAND_SIZE];
     char name[MAX_NAME_SIZE];
     uint32_t salary;
+    int i, num_threads;
+    threadArgs *curr_args;
 
     if (input == NULL || output == NULL)
     {
@@ -27,8 +32,30 @@ int main(void)
 
     hashRecord *head = NULL;
 
-    while (1)
+    char first[MAX_COMMAND_SIZE];
+    fscanf(input, "%[^\n]\n", first);
+
+    char *first_token = strtok(first, ",");
+
+
+    if (strcmp(first_token, "threads") == 0)
     {
+        first_token = strtok(NULL, ",");
+        if (!first_token || sscanf(first_token, "%d", &num_threads) != 1)
+        {
+            fprintf(output, "Error reading number of threads\n");
+            return 1;
+        }
+        // Testing
+        fprintf(output, "Setting number of threads to %d\n", num_threads); // Comment this after you implement threads
+    }
+
+    pthread_t *threads = malloc(sizeof(pthread_t) * num_threads);
+
+    for (i = 0; i < num_threads; i++)
+    {
+        if (DEBUG) printf("in for loop\n");
+
         if (fscanf(input, "%[^\n]\n", command) != 1)
         {
             if (feof(input))
@@ -50,19 +77,7 @@ int main(void)
             continue;
         }
 
-        if (strcmp(token, "threads") == 0)
-        {
-            token = strtok(NULL, ",");
-            if (!token || sscanf(token, "%d", &salary) != 1)
-            {
-                fprintf(output, "Error reading number of threads\n");
-                return 1;
-            }
-            // Testing
-            fprintf(output, "Running 11 threads\n"); // Comment this after you implement threads
-
-        }
-        else if (strcmp(token, "insert") == 0)
+        if (strcmp(token, "insert") == 0)
         {
             token = strtok(NULL, ",");
             if (!token || sscanf(token, "%[^,],", name) != 1)
@@ -79,8 +94,11 @@ int main(void)
             // Testing
             //fprintf(output, "Inserting %s with salary %d\n", name, salary); // Comment this after you implement insert
 
+            // fill arguments here
+            curr_args = fillArgs(&head, name, salary, output);
+
             // Call insert
-            if (!insert(&head, name, salary, output))
+            if (!pthread_create(&threads[i], NULL, insert_routine, curr_args))
             {
                 fprintf(output, "Error inserting record\n");
                 return 1;

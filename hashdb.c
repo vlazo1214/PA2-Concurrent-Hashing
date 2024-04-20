@@ -1,7 +1,11 @@
 #include "hashdb.h"
 #include <stdio.h>
+#include <pthread.h>
 
 #define DEBUG 1
+
+static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+threadArgs *curr_args;
 
 // auxiliary functions
 uint32_t jenkins_one_at_a_time_hash(const uint8_t *key, size_t length) {
@@ -20,13 +24,30 @@ uint32_t jenkins_one_at_a_time_hash(const uint8_t *key, size_t length) {
     return hash;
 }
 
+threadArgs *fillArgs(hashRecord **head, const char *name, uint32_t salary, FILE *output)
+{
+    // Allocate memory for the new record
+    threadArgs *newArgs = (threadArgs*)malloc(sizeof(threadArgs));
+
+    // Populate the fields of the new record
+    newArgs->head = &head;
+
+    strncpy(newArgs->name, name, sizeof(newArgs->name)-1);
+    newArgs->name[sizeof(newArgs->name)-1] = '\0';
+    newArgs->salary = salary;
+
+    newArgs->output = output;
+
+    return newArgs;
+}
+
 hashRecord *create_node(uint32_t hash, const char *name, uint32_t salary)
 {
     // Allocate memory for the new record
     hashRecord *newRecord = (hashRecord*)malloc(sizeof(hashRecord));
     if (newRecord == NULL) {
         printf("Memory allocation failed\n");
-        return false; 
+        return NULL; 
     }
 
     // Populate the fields of the new record
@@ -37,6 +58,17 @@ hashRecord *create_node(uint32_t hash, const char *name, uint32_t salary)
     newRecord->next = NULL;
 
     return newRecord;
+}
+
+void *insert_routine(void *arg)
+{
+    // acquire lock
+    pthread_mutex_lock(&mutex);
+
+    insert(curr_args->head, curr_args->name, curr_args->salary, curr_args->output);
+
+    // release lock
+    pthread_mutex_unlock(&mutex);
 }
 
 bool insert(hashRecord **head, const char *name, uint32_t salary, FILE *output) {
