@@ -174,6 +174,9 @@ hashRecord* copyLinkedList(const hashRecord* original) {
 
 bool print(hashRecord *head, FILE *output)
 {
+    //pthread_mutex_lock(&mutex); 
+    //fprintf(output, "READ LOCK ACQUIRED\n");
+
     if (!head)
     {
         return false;
@@ -226,6 +229,9 @@ bool print(hashRecord *head, FILE *output)
         free(temp);
     }
 
+    //pthread_mutex_lock(&mutex); 
+    //fprintf(output, "READ LOCK RELEASED\n");
+
     return true;
 }
 // char* search(hashRecord *hashTable[], const char *name)
@@ -264,6 +270,9 @@ hashRecord* search(hashRecord *hashTable, const char *name, FILE *fp)
 
 void delete_real(hashRecord *hashTable, const char *name, FILE * fp)
 { 
+    pthread_mutex_lock(&mutex); 
+    fprintf(fp, "WRITE LOCK ACQUIRED\n");
+
     uint32_t hash = jenkins_one_at_a_time_hash((const uint8_t*)name, strlen(name));
     hashRecord *prev = NULL;
     hashRecord *curr = hashTable;
@@ -285,12 +294,19 @@ void delete_real(hashRecord *hashTable, const char *name, FILE * fp)
             printf("Delete- Deleting: %s\n", curr->name);
             //fprintf(fp, "Delete- Deleting: %s\n", curr->name);
             free(curr);
+
+
+            pthread_mutex_unlock(&mutex); 
+            fprintf(fp, "WRITE LOCK RELEASED\n");
             return true; 
         }
 
         prev = curr;
         curr = curr->next;
     }
+
+    pthread_mutex_unlock(&mutex); 
+    fprintf(fp, "WRITE LOCK RELEASED\n");
 
     return false;
 }

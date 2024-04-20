@@ -160,6 +160,8 @@ int main(void)
         fflush(stdout);
     }
     
+    print(head, output);
+
     fclose(input);
     fclose(output);
     return 0;
