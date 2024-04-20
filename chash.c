@@ -33,6 +33,7 @@ int main(void)
         {
             if (feof(input))
             {
+                print(head, output);
                 break;
             }
             else
@@ -76,7 +77,7 @@ int main(void)
                 return 1;
             }
             // Testing
-            fprintf(output, "Inserting %s with salary %d\n", name, salary); // Comment this after you implement insert
+            //fprintf(output, "Inserting %s with salary %d\n", name, salary); // Comment this after you implement insert
 
             // Call insert
             if (!insert(&head, name, salary, output))

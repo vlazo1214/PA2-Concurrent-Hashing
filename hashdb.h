@@ -27,6 +27,7 @@ bool insert(hashRecord **head, const char *name, uint32_t salary, FILE *output);
 // bool search(hashRecord *head, uint32_t hash);
 // bool delete(hashRecord *head, uint32_t hash);
 bool print(hashRecord *head, FILE *output);
+hashRecord* copyLinkedList(const hashRecord* original);
 
 
 #endif
