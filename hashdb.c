@@ -39,7 +39,7 @@ hashRecord *create_node(uint32_t hash, const char *name, uint32_t salary)
     return newRecord;
 }
 
-bool insert(hashRecord **head, const char *name, uint32_t salary) {
+bool insert(hashRecord **head, const char *name, uint32_t salary, FILE *output) {
     // Calculate hash based on the name
     uint32_t hash = jenkins_one_at_a_time_hash((const uint8_t *)name, strlen(name));
 
@@ -60,7 +60,7 @@ bool insert(hashRecord **head, const char *name, uint32_t salary) {
     return true; 
 }
 
-bool print(hashRecord *head)
+bool print(hashRecord *head, FILE *output)
 {
     if (!head)
     {
@@ -93,8 +93,6 @@ bool print(hashRecord *head)
 
     // Print the sorted linked list
     hashRecord *temp = head;
-    FILE *output = fopen("output.txt", "w");
-
     while (temp != NULL)
     {
         fprintf(output, "%u,%s,%u\n", temp->hash,temp->name, temp->salary);

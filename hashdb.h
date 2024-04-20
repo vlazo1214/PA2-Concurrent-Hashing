@@ -8,6 +8,7 @@
 #include <string.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 #define NUM_BUCKETS 13
 
@@ -22,10 +23,10 @@ typedef struct hash_struct
 
 uint32_t jenkins_one_at_a_time_hash(const uint8_t *key, size_t length);
 
-bool insert(hashRecord **head, const char *name, uint32_t salary);
+bool insert(hashRecord **head, const char *name, uint32_t salary, FILE *output);
 // bool search(hashRecord *head, uint32_t hash);
 // bool delete(hashRecord *head, uint32_t hash);
-bool print(hashRecord *head);
+bool print(hashRecord *head, FILE *output);
 
 
 #endif

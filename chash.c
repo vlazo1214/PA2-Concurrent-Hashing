@@ -79,7 +79,7 @@ int main(void)
             fprintf(output, "Inserting %s with salary %d\n", name, salary); // Comment this after you implement insert
 
             // Call insert
-            if (!insert(&head, name, salary))
+            if (!insert(&head, name, salary, output))
             {
                 fprintf(output, "Error inserting record\n");
                 return 1;
@@ -115,7 +115,7 @@ int main(void)
         {
             // Testing
             fprintf(output, "Printing hash table\n"); // Comment this after you implement print
-            print(head);
+            print(head, output);
             // Implement print here
         }
         else
