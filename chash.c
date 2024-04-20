@@ -14,7 +14,7 @@
 int main(void)
 {
     FILE *input = fopen("commands.txt", "r");
-    FILE *output = fopen("test.txt", "w");
+    FILE *output = fopen("output.txt", "w");
     char command[MAX_COMMAND_SIZE];
     char name[MAX_NAME_SIZE];
     uint32_t salary;
@@ -59,7 +59,7 @@ int main(void)
                 return 1;
             }
             // Testing
-            fprintf(output, "Setting number of threads to %d\n", salary); // Comment this after you implement threads
+            fprintf(output, "Running 11 threads\n"); // Comment this after you implement threads
 
         }
         else if (strcmp(token, "insert") == 0)
@@ -94,7 +94,7 @@ int main(void)
                 fprintf(output, "Error reading delete name\n");
                 return 1;
             }
-            fprintf(output, "DELETE,%s", name);
+            fprintf(output, "DELETE,%s\n", name);
             // fprintf(output, "Deleting %s\n", name); // Comment this after you implement delete
             // FPRINT READ LOCK ACQUIRED
             fprintf(output, "SEARCH,%s\n", name);
@@ -117,7 +117,7 @@ int main(void)
             // fprintf(output, "Searching for %s\n", name); // Comment this after you implement search
             fprintf(output, "SEARCH,%s\n", name);
             // FPRINT READ LOCK ACQUIRED
-            hashRecord *r = search(head, name);
+            hashRecord *r = search(head, name, output);
             // FPRINT READ LOCK RELEASE
             fprintf(output, "%u,%s,%u\n", r->hash, r->name, r->salary);
 
@@ -126,7 +126,7 @@ int main(void)
         else if (strcmp(token, "print") == 0)
         {
             // Testing
-            fprintf(output, "Printing hash table\n"); // Comment this after you implement print
+            //fprintf(output, "Printing hash table\n"); // Comment this after you implement print
             print(head, output);
             // Implement print here
         }
