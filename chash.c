@@ -46,7 +46,7 @@ int main(void)
             return 1;
         }
         // Testing
-        fprintf(output, "Setting number of threads to %d\n", num_threads); // Comment this after you implement threads
+        fprintf(output, "Running %d threads\n", num_threads); // Comment this after you implement threads
     }
 
     pthread_t *threads = malloc(sizeof(pthread_t) * num_threads);

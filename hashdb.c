@@ -68,8 +68,14 @@ hashRecord *create_node(uint32_t hash, const char *name, uint32_t salary)
 
 void insert_routine(void *arg)
 {
+
+
     pthread_mutex_lock(&mutex);
     threadArgs *curr_args = (threadArgs *)arg;
+
+    uint32_t hash = jenkins_one_at_a_time_hash((const uint8_t *)curr_args->name, strlen(curr_args->name));
+    fprintf(curr_args->output, "INSERT,%u,%s,%u\n", hash, curr_args->name, curr_args->salary);
+
     fprintf(curr_args->output, "WRITE LOCK ACQUIRED\n");
 
     if (DEBUG)
@@ -101,7 +107,7 @@ void insert(hashRecord **head, const char *name, uint32_t salary, FILE *output) 
     uint32_t hash = jenkins_one_at_a_time_hash((const uint8_t *)name, strlen(name));
 
     //printf("INSERT,%u,%s,%u\n", hash, name, salary);
-    fprintf(output, "INSERT,%u,%s,%u\n", hash, name, salary);
+    //fprintf(output, "INSERT,%u,%s,%u\n", hash, name, salary);
 
     printf("printed to file\n");
 
