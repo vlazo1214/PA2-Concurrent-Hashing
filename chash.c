@@ -111,15 +111,14 @@ int main(void)
                 return 1;
             }
             fprintf(output, "DELETE,%s\n", name);
-            // fprintf(output, "Deleting %s\n", name); // Comment this after you implement delete
-            // FPRINT READ LOCK ACQUIRED
-            fprintf(output, "SEARCH,%s\n", name);
-            // FPRINT READ LOCK RELEASE
-             if (delete(head, name, output)) // if true
-             {
 
-             }
+            searchArgs *delete_args = (searchArgs *)malloc(sizeof(searchArgs));
+            delete_args->hashTable = head;
+            delete_args->name = name;
+            delete_args->output = output;
 
+            pthread_create(&threads[i], NULL, delete_routine, delete_args);
+            pthread_join(threads[i], NULL);
         }
         else if (strcmp(token, "search") == 0)
         {

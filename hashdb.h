@@ -40,7 +40,9 @@ void insert_routine(void *arg);
 // bool search(hashRecord *head, uint32_t hash);
 hashRecord* search(hashRecord *hashTable, const char *name, FILE * fp);
 void *search_routine(void *arg);
-bool delete(hashRecord *hashTable, const char *name, FILE * fp);
+bool delete_prelude(searchArgs *delete_args);
+void delete_real(hashRecord *hashTable, const char *name, FILE * fp);
+void *delete_routine(void *arg);
 bool print(hashRecord *head, FILE *output);
 hashRecord* copyLinkedList(const hashRecord* original);
 

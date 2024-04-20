@@ -232,7 +232,7 @@ bool print(hashRecord *head, FILE *output)
 hashRecord* search(hashRecord *hashTable, const char *name, FILE *fp)
 {
     pthread_mutex_lock(&mutex); 
-    fprintf(fp, "WRITE LOCK ACQUIRED\n");
+    fprintf(fp, "READ LOCK ACQUIRED\n");
 
     hashRecord *record = hashTable;
     uint32_t hash = jenkins_one_at_a_time_hash((const uint8_t*)name, strlen(name));
@@ -255,14 +255,14 @@ hashRecord* search(hashRecord *hashTable, const char *name, FILE *fp)
     printf("Search- Key found: %u,%s,%u\n", record->hash, record->name, record->salary);
 
     pthread_mutex_unlock(&mutex); // Release mutex lock
-    fprintf(fp, "WRITE LOCK RELEASED\n");
+    fprintf(fp, "READ LOCK RELEASED\n");
     
     fprintf(fp, "%u,%s,%u\n", record->hash, record->name, record->salary);
 
     return record;
 }
 
-bool delete(hashRecord *hashTable, const char *name, FILE * fp)
+void delete_real(hashRecord *hashTable, const char *name, FILE * fp)
 { 
     uint32_t hash = jenkins_one_at_a_time_hash((const uint8_t*)name, strlen(name));
     hashRecord *prev = NULL;
@@ -283,7 +283,6 @@ bool delete(hashRecord *hashTable, const char *name, FILE * fp)
 
             // Free the memory of the node to be deleted
             printf("Delete- Deleting: %s\n", curr->name);
-            fprintf(fp, "%u,%s,%u\n", curr->hash, curr->name, curr->salary);
             //fprintf(fp, "Delete- Deleting: %s\n", curr->name);
             free(curr);
             return true; 
@@ -302,7 +301,53 @@ void *search_routine(void *arg) {
     // Perform search operation within the critical section protected by mutex
     hashRecord *result = search(args->hashTable, args->name, args->output);
 
-    // Handle the search result as needed
-
     return NULL;
+}
+
+void *delete_routine(void *arg)
+{
+    searchArgs *args = (searchArgs *)arg;
+
+    if (!delete_prelude(args))
+    {
+        return;
+    }
+
+    delete_real(args->hashTable, args->name, args->output);
+}
+
+bool delete_prelude(searchArgs *delete_args)
+{
+    pthread_mutex_lock(&mutex); 
+    fprintf(delete_args->output, "READ LOCK ACQUIRED\n");
+
+    uint32_t hash = jenkins_one_at_a_time_hash((const uint8_t*)delete_args->name, strlen(delete_args->name));
+    
+    fprintf(delete_args->output, "SEARCH,%s\n", delete_args->name);
+
+    hashRecord *curr = delete_args->hashTable;
+
+    while (curr != NULL)
+    {
+        if (curr->hash == hash)
+            break;
+        curr = curr->next;
+    }
+
+    if (curr == NULL)
+    {
+        printf("No Record Found\n");
+        fprintf(delete_args->output, "No Record Found\n");
+        pthread_mutex_unlock(&mutex);
+        return false;
+    }
+
+    // printf("Search- Key found: %u,%s,%u\n", curr->hash, curr->name, curr->salary);
+
+    pthread_mutex_unlock(&mutex); 
+    fprintf(delete_args->output, "READ LOCK RELEASED\n");
+    
+    fprintf(delete_args->output, "%u,%s,%u\n", curr->hash, curr->name, curr->salary);
+    
+    return true;
 }
