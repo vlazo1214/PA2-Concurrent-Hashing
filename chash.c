@@ -11,7 +11,7 @@
 #define MAX_COMMAND_SIZE 100
 #define MAX_NAME_SIZE 100
 
-#define DEBUG 1
+#define DEBUG 0
 
 int main(void)
 {
@@ -99,11 +99,8 @@ int main(void)
             curr_args = fillArgs(&head, name, salary, output);
 
             // Call insert
-            if (!pthread_create(&threads[i], NULL, insert_routine, curr_args))
-            {
-                fprintf(output, "Error inserting record\n");
-                return 1;
-            }
+            pthread_create(&threads[i], NULL, insert_routine, (void *)curr_args);
+            pthread_join(threads[i], NULL);
         }
         else if (strcmp(token, "delete") == 0)
         {

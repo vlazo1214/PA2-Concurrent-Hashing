@@ -29,8 +29,8 @@ typedef struct args_struct
 uint32_t jenkins_one_at_a_time_hash(const uint8_t *key, size_t length);
 
 // hashRecord **head, const char *name, uint32_t salary, FILE *output
-bool insert(hashRecord **head, const char *name, uint32_t salary, FILE *output);
-void *insert_routine(void *arg);
+void insert(hashRecord **head, const char *name, uint32_t salary, FILE *output);
+void insert_routine(void *arg);
 // bool search(hashRecord *head, uint32_t hash);
 hashRecord* search(hashRecord *hashTable, const char *name, FILE * fp);
 bool delete(hashRecord *hashTable, const char *name, FILE * fp);

@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <pthread.h>
 
-#define DEBUG 1
+#define DEBUG 0
 
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 threadArgs *curr_args;
@@ -34,7 +34,7 @@ threadArgs *fillArgs(hashRecord **head, const char *name, uint32_t salary, FILE 
     if (DEBUG) printf("malloc'd\n");
 
     // Populate the fields of the new record
-    newArgs->head = &head;
+    newArgs->head = head;
 
     strncpy(newArgs->name, name, sizeof(newArgs->name)-1);
     newArgs->name[sizeof(newArgs->name)-1] = '\0';
@@ -66,33 +66,49 @@ hashRecord *create_node(uint32_t hash, const char *name, uint32_t salary)
     return newRecord;
 }
 
-void *insert_routine(void *arg)
+void insert_routine(void *arg)
 {
-    if (DEBUG) printf("in insert routine\n");
+    pthread_mutex_lock(&mutex);
+    threadArgs *curr_args = (threadArgs *)arg;
+    fprintf(curr_args->output, "WRITE LOCK ACQUIRED\n");
+
+    if (DEBUG)
+        printf("in insert routine\n");
 
     // acquire lock
-    pthread_mutex_lock(&mutex);
-
+    if (DEBUG)
+        printf("segmentation fault after this line\n");
+    
     insert(curr_args->head, curr_args->name, curr_args->salary, curr_args->output);
+
+    if (DEBUG)
+        printf("amogus\n");
+
+    if (DEBUG)
+        printf("3\n");
 
     // release lock
     pthread_mutex_unlock(&mutex);
+    fprintf(curr_args->output, "WRITE LOCK RELEASED\n");
+
+    return;
 }
 
-bool insert(hashRecord **head, const char *name, uint32_t salary, FILE *output) {
+void insert(hashRecord **head, const char *name, uint32_t salary, FILE *output) {
     if (DEBUG) printf("in actual insert\n");
 
     // Calculate hash based on the name
     uint32_t hash = jenkins_one_at_a_time_hash((const uint8_t *)name, strlen(name));
 
+    //printf("INSERT,%u,%s,%u\n", hash, name, salary);
     fprintf(output, "INSERT,%u,%s,%u\n", hash, name, salary);
 
-    if (DEBUG) printf("printed to file\n");
+    printf("printed to file\n");
 
     // If the list is empty, make the new record the head
     if (*head == NULL) {
         *head = create_node(hash, name, salary);
-        return true; 
+        return; 
     }
 
     // Traverse the list to find the last node
@@ -103,7 +119,7 @@ bool insert(hashRecord **head, const char *name, uint32_t salary, FILE *output) 
 
     // Append the new record to the end of the list
     current->next = create_node(hash, name, salary);
-    return true; 
+    return; 
 }
 
 hashRecord* copyHashRecord(const hashRecord* original) {
@@ -192,7 +208,7 @@ bool print(hashRecord *head, FILE *output)
     while (temp != NULL)
     {
         fprintf(output, "%u,%s,%u\n", temp->hash,temp->name, temp->salary);
-        //printf("%u,%s,%u\n", temp->hash, temp->name, temp->salary);
+        printf("%u,%s,%u\n", temp->hash, temp->name, temp->salary);
         temp = temp->next;
     }
 
