@@ -229,50 +229,37 @@ bool print(hashRecord *head, FILE *output)
     return true;
 }
 // char* search(hashRecord *hashTable[], const char *name)
-hashRecord* search(hashRecord *hashTable, const char *name, FILE * fp)
+hashRecord* search(hashRecord *hashTable, const char *name, FILE *fp)
 {
+    pthread_mutex_lock(&mutex); 
+    fprintf(fp, "WRITE LOCK ACQUIRED\n");
+
     hashRecord *record = hashTable;
     uint32_t hash = jenkins_one_at_a_time_hash((const uint8_t*)name, strlen(name));
 
-    // locate the corresponding node
-    // record = hashTable[hash];
-    while (record!= NULL)
+    while (record != NULL)
     {
-        // check the current record's hashval
         if (record->hash == hash)
             break;
         record = record->next;
     }
-    // now we have the right record
 
-    // acquire read lock
-    // printf("READ LOCK ACQUIRED");
-    // protect list
-
-    // search linked list for the key
-
-    // if key is not found: 
     if (record == NULL)
     {
-        printf("No Record Found");
-        fprintf(fp, "No Record Found");
-        // release read lock and return -> probably in main
+        printf("No Record Found\n");
+        fprintf(fp, "No Record Found\n");
+        pthread_mutex_unlock(&mutex);
         return NULL;
     }
 
-    // if key is found:
-    if (record != NULL)
-    {
-        // print record
-        printf("Search- Key found: %u,%s,%u\n", record->hash, record->name, record->salary); // FORMAT LATER WHEN FIGURE OUT FORMATTING
-        //fprintf(fp, "%u,%s,%u\n", record->hash, record->name, record->salary);
-        //fprintf(fp, "Search- Key found: %u,%s,%u\n", record->hash, record->name, record->salary);
+    printf("Search- Key found: %u,%s,%u\n", record->hash, record->name, record->salary);
 
-        return record;
-    }
+    pthread_mutex_unlock(&mutex); // Release mutex lock
+    fprintf(fp, "WRITE LOCK RELEASED\n");
+    
+    fprintf(fp, "%u,%s,%u\n", record->hash, record->name, record->salary);
+
     return record;
-    // IN CHASH, IF SEARCH() == NULL, 
-    // ELSE PRINT ("%") RECORD.HASH,RECORD.
 }
 
 bool delete(hashRecord *hashTable, const char *name, FILE * fp)
@@ -307,4 +294,15 @@ bool delete(hashRecord *hashTable, const char *name, FILE * fp)
     }
 
     return false;
+}
+
+void *search_routine(void *arg) {
+        searchArgs *args = (searchArgs *)arg;
+
+    // Perform search operation within the critical section protected by mutex
+    hashRecord *result = search(args->hashTable, args->name, args->output);
+
+    // Handle the search result as needed
+
+    return NULL;
 }

@@ -133,10 +133,18 @@ int main(void)
             // fprintf(output, "Searching for %s\n", name); // Comment this after you implement search
             fprintf(output, "SEARCH,%s\n", name);
             // FPRINT READ LOCK ACQUIRED
-            hashRecord *r = search(head, name, output);
-            // FPRINT READ LOCK RELEASE
-            fprintf(output, "%u,%s,%u\n", r->hash, r->name, r->salary);
+            // Inside the main function
 
+    // Prepare arguments for search routine
+        searchArgs *search_args = (searchArgs *)malloc(sizeof(searchArgs));
+        search_args->hashTable = head;
+        search_args->name = name;
+        search_args->output = output;
+
+
+        // Create thread for search operation
+        pthread_create(&threads[i], NULL, search_routine, (void *)search_args);
+            pthread_join(threads[i], NULL);
             // Implement search here
         }
         else if (strcmp(token, "print") == 0)
