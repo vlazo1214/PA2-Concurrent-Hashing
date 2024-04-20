@@ -20,11 +20,12 @@ typedef struct hash_struct
 } hashRecord;
 
 
-uint32_t calculate_hash(const char *str);
+uint32_t jenkins_one_at_a_time_hash(const uint8_t *key, size_t length);
 
-bool insert(hashRecord *head, const char *name, uint32_t salary);
+bool insert(hashRecord **head, const char *name, uint32_t salary);
 // bool search(hashRecord *head, uint32_t hash);
 // bool delete(hashRecord *head, uint32_t hash);
+bool print(hashRecord *head);
 
 
 #endif
