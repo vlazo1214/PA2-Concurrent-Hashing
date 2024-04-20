@@ -26,8 +26,12 @@ uint32_t jenkins_one_at_a_time_hash(const uint8_t *key, size_t length) {
 
 threadArgs *fillArgs(hashRecord **head, const char *name, uint32_t salary, FILE *output)
 {
+    if (DEBUG) printf("in fill arguments\n");
+    
     // Allocate memory for the new record
     threadArgs *newArgs = (threadArgs*)malloc(sizeof(threadArgs));
+
+    if (DEBUG) printf("malloc'd\n");
 
     // Populate the fields of the new record
     newArgs->head = &head;
@@ -37,6 +41,8 @@ threadArgs *fillArgs(hashRecord **head, const char *name, uint32_t salary, FILE 
     newArgs->salary = salary;
 
     newArgs->output = output;
+
+    if (DEBUG) printf("abt to exit fill arguments\n");
 
     return newArgs;
 }
@@ -62,6 +68,8 @@ hashRecord *create_node(uint32_t hash, const char *name, uint32_t salary)
 
 void *insert_routine(void *arg)
 {
+    if (DEBUG) printf("in insert routine\n");
+
     // acquire lock
     pthread_mutex_lock(&mutex);
 
@@ -72,10 +80,14 @@ void *insert_routine(void *arg)
 }
 
 bool insert(hashRecord **head, const char *name, uint32_t salary, FILE *output) {
+    if (DEBUG) printf("in actual insert\n");
+
     // Calculate hash based on the name
     uint32_t hash = jenkins_one_at_a_time_hash((const uint8_t *)name, strlen(name));
 
     fprintf(output, "INSERT,%u,%s,%u\n", hash, name, salary);
+
+    if (DEBUG) printf("printed to file\n");
 
     // If the list is empty, make the new record the head
     if (*head == NULL) {

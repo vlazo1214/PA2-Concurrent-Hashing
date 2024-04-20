@@ -5,7 +5,6 @@
 #include <string.h>
 #include <pthread.h>
 #include "hashdb.h"
-#include "rwlocks.h"
 #include "common.h"
 #include "common_threads.h"
 
@@ -95,6 +94,8 @@ int main(void)
             //fprintf(output, "Inserting %s with salary %d\n", name, salary); // Comment this after you implement insert
 
             // fill arguments here
+            if (DEBUG) printf("abt to fill arguments\n");
+
             curr_args = fillArgs(&head, name, salary, output);
 
             // Call insert
