@@ -49,56 +49,91 @@ bool insert(hashRecord *hashTable[], const char *name, uint32_t salary) {
     return true;
 }
 
-char* search(hashRecord *hashTable[], const char *name)
+// char* search(hashRecord *hashTable[], const char *name)
+hashRecord* search(hashRecord *hashTable, const char *name)
 {
-
-    bool key = false; // probably better way to do this but just to set up the code
+    hashRecord *record = hashTable;
+    // bool key = false; // probably better way to do this but just to set up the code
     // call hash function to compute the hashvalue of the key
     // Calculate hash value for the given name
-    uint32_t hash = calculate_hash(name);
+    // uint32_t hash = calculate_hash(name);
+    uint32_t hash = jenkins_one_at_a_time_hash((const uint8_t*)name, strlen(name));
 
     // locate the corresponding node
+    // record = hashTable[hash];
+    while (record!= NULL)
+    {
+        // check the current record's hashval
+        if (record->hash == hash)
+            break;
+        record = record->next;
+    }
+    // now we have the right record
 
     // acquire read lock
+    // printf("READ LOCK ACQUIRED");
     // protect list
+
     // search linked list for the key
 
     // if key is not found: 
-    if (!key)
+    if (record == NULL)
     {
         // probably need fprintf? but also I'd need the file name as a parameter
         printf("No Record Found");
-        return null;
-
+        // release read lock and return -> probably in main
+        return NULL;
     }
 
     // if key is found:
-    if (key)
+    if (record != NULL)
     {
         // print record
-        print(name) // FORMAT LATER WHEN FIGURE OUT FORMATTING
-        // return value
-    }
-    // release read lock and return
+        printf("%u,%s,%u", record->hash, record->name, record->salary); // FORMAT LATER WHEN FIGURE OUT FORMATTING
 
+        return record;
+    }
+    return record;
+    // IN CHASH, IF SEARCH() == NULL, 
+    // ELSE PRINT ("%") RECORD.HASH,RECORD.
 }
 
-void delete(hashRecord *hashTable[], const char *name)
-{
-    // call hash function to compute the hashvalue of the key
+bool delete(hashRecord *hashTable, const char *name, FILE * fp)
+{ 
+    uint32_t hash = jenkins_one_at_a_time_hash((const uint8_t*)name, strlen(name));
+    hashRecord *r = hashTable;
+    hashRecord *previous = NULL;
 
-    // locate the corresponding node
+    // if the head is what needs to change
+    if (r->hash == hash)
+    {
+        hashTable = hashTable->next;
+        fprintf("%s", r->name);
+        free(r->name);
+        free(r);
+        return true;
+    }
+    // it's not the head, so start looking next
+    previous = r;
+    r = r->next;
 
-    // acquire write lock
-    // protect list
-    // search linked list for the key
-
-    // if not found: 
-    // do nothing (and return?)
-
-    // if found:
-    // remove node from list
-    // free memory
-
-    // release write lock and return    
+    // at the start of the loop we're still at the head
+    while (r != NULL)
+    {    
+        // if we found the hash value
+        if (r->hash == hash)
+        {
+            // remove record from linked list
+            previous->next = r->next;
+            fprintf("%s", r->name);
+            // free record memory
+            free(r->name);
+            free(r);
+            return true;
+        }
+        previous = r;
+        r = r->next;
+    }
+    // by here, r is null/at the end and still no match, so return false;
+    return false;
 }
