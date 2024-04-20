@@ -2,6 +2,8 @@
 #include <stdio.h>
 
 #define DEBUG 1
+
+// auxiliary functions
 uint32_t jenkins_one_at_a_time_hash(const uint8_t *key, size_t length) {
     size_t i = 0;
     uint32_t hash = 0;
@@ -18,10 +20,8 @@ uint32_t jenkins_one_at_a_time_hash(const uint8_t *key, size_t length) {
     return hash;
 }
 
-bool insert(hashRecord **head, const char *name, uint32_t salary) {
-    // Calculate hash based on the name
-    uint32_t hash = jenkins_one_at_a_time_hash((const uint8_t *)name, strlen(name));
-
+hashRecord *create_node(uint32_t hash, const char *name, uint32_t salary)
+{
     // Allocate memory for the new record
     hashRecord *newRecord = (hashRecord*)malloc(sizeof(hashRecord));
     if (newRecord == NULL) {
@@ -36,9 +36,16 @@ bool insert(hashRecord **head, const char *name, uint32_t salary) {
     newRecord->salary = salary;
     newRecord->next = NULL;
 
+    return newRecord;
+}
+
+bool insert(hashRecord **head, const char *name, uint32_t salary) {
+    // Calculate hash based on the name
+    uint32_t hash = jenkins_one_at_a_time_hash((const uint8_t *)name, strlen(name));
+
     // If the list is empty, make the new record the head
     if (*head == NULL) {
-        *head = newRecord;
+        *head = create_node(hash, name, salary);
         return true; 
     }
 
@@ -49,7 +56,7 @@ bool insert(hashRecord **head, const char *name, uint32_t salary) {
     }
 
     // Append the new record to the end of the list
-    current->next = newRecord;
+    current->next = create_node(hash, name, salary);
     return true; 
 }
 
