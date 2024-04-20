@@ -109,6 +109,7 @@ bool print(hashRecord *head, FILE *output)
     }
 
     return true;
+}
 // char* search(hashRecord *hashTable[], const char *name)
 hashRecord* search(hashRecord *hashTable, const char *name)
 {
