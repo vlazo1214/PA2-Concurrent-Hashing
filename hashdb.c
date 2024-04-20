@@ -43,6 +43,8 @@ bool insert(hashRecord **head, const char *name, uint32_t salary, FILE *output) 
     // Calculate hash based on the name
     uint32_t hash = jenkins_one_at_a_time_hash((const uint8_t *)name, strlen(name));
 
+    fprintf(output, "INSERT,%u,%s,%u\n", hash, name, salary);
+
     // If the list is empty, make the new record the head
     if (*head == NULL) {
         *head = create_node(hash, name, salary);
@@ -60,15 +62,66 @@ bool insert(hashRecord **head, const char *name, uint32_t salary, FILE *output) 
     return true; 
 }
 
+hashRecord* copyHashRecord(const hashRecord* original) {
+    if (!original)
+        return NULL;
+
+    hashRecord* copy = malloc(sizeof(hashRecord));
+    if (!copy)
+        return NULL;
+
+    // Copy the data
+    copy->hash = original->hash;
+    strncpy(copy->name, original->name, sizeof(original->name));
+    copy->salary = original->salary;
+    copy->next = NULL;
+
+    return copy;
+}
+
+hashRecord* copyLinkedList(const hashRecord* original) {
+    if (!original)
+        return NULL;
+
+    hashRecord* new_head = NULL;
+    hashRecord* tail = NULL;
+
+    while (original) {
+        hashRecord* copied_node = copyHashRecord(original);
+        if (!copied_node) {
+            return NULL;
+        }
+
+        if (!new_head) {
+            new_head = copied_node;
+            tail = copied_node;
+        } else {
+            tail->next = copied_node;
+            tail = copied_node;
+        }
+
+        original = original->next;
+    }
+
+    return new_head;
+}
+
 bool print(hashRecord *head, FILE *output)
 {
     if (!head)
     {
         return false;
     }
-    // Sort the linked list based on hash values (Insertion Sort)
+
+    // Copy the linked list so original stays in tact
+    hashRecord* copied_list = copyLinkedList(head);
+    if (!copied_list) {
+        return false;
+    }
+
+    // Sort the copied linked list based on hash values (Insertion Sort)
     hashRecord *sorted = NULL;
-    hashRecord *current = head;
+    hashRecord *current = copied_list;
     while (current != NULL)
     {
         hashRecord *temp = current;
@@ -89,10 +142,9 @@ bool print(hashRecord *head, FILE *output)
             current_sorted->next = temp;
         }
     }
-    head = sorted;
 
     // Print the sorted linked list
-    hashRecord *temp = head;
+    hashRecord *temp = sorted;
     while (temp != NULL)
     {
         fprintf(output, "%u,%s,%u\n", temp->hash,temp->name, temp->salary);
@@ -100,11 +152,11 @@ bool print(hashRecord *head, FILE *output)
         temp = temp->next;
     }
 
-    // Free allocated memory
-    while (head != NULL)
+    // Free the copied linked list
+    while (copied_list != NULL)
     {
-        hashRecord *temp = head;
-        head = head->next;
+        hashRecord *temp = copied_list;
+        copied_list = copied_list->next;
         free(temp);
     }
 
