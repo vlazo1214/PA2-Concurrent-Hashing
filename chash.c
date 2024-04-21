@@ -95,7 +95,7 @@ int main(void)
             curr_args = fillArgs(&head, name, salary, output);
 
             // Call insert
-            pthread_create(&threads[i], NULL, insert_routine, (void *)curr_args);
+            pthread_create(&threads[i], NULL, (void *)insert_routine, (void *)curr_args);
             pthread_join(threads[i], NULL);
             ++count;
         }

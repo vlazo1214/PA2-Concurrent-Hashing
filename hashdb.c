@@ -83,7 +83,7 @@ void insert_routine(void *arg)
 }
 
 void insert(hashRecord **head, const char *name, uint32_t salary, FILE *output) {
-
+    output = output;
     // Calculate hash based on the name
     uint32_t hash = jenkins_one_at_a_time_hash((const uint8_t *)name, strlen(name));
 
@@ -274,7 +274,7 @@ void delete_real(hashRecord *hashTable, const char *name, FILE * fp)
 
             pthread_mutex_unlock(&mutex); 
             fprintf(fp, "WRITE LOCK RELEASED\n");
-            return true; 
+            return; 
         }
 
         prev = curr;
@@ -284,14 +284,14 @@ void delete_real(hashRecord *hashTable, const char *name, FILE * fp)
     pthread_mutex_unlock(&mutex); 
     fprintf(fp, "WRITE LOCK RELEASED\n");
 
-    return false;
+    return;
 }
 
 void *search_routine(void *arg) {
         searchArgs *args = (searchArgs *)arg;
 
     // Perform search operation within the critical section protected by mutex
-    hashRecord *result = search(args->hashTable, args->name, args->output);
+    search(args->hashTable, args->name, args->output);
 
     return NULL;
 }
@@ -302,10 +302,12 @@ void *delete_routine(void *arg)
 
     if (!delete_prelude(args))
     {
-        return;
+        return NULL;
     }
 
     delete_real(args->hashTable, args->name, args->output);
+
+    return NULL;
 }
 
 bool delete_prelude(searchArgs *delete_args)
