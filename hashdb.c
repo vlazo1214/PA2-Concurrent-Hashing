@@ -2,8 +2,6 @@
 #include <stdio.h>
 #include <pthread.h>
 
-#define DEBUG 0
-
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 threadArgs *curr_args;
 
@@ -26,12 +24,9 @@ uint32_t jenkins_one_at_a_time_hash(const uint8_t *key, size_t length) {
 
 threadArgs *fillArgs(hashRecord **head, const char *name, uint32_t salary, FILE *output)
 {
-    if (DEBUG) printf("in fill arguments\n");
     
     // Allocate memory for the new record
     threadArgs *newArgs = (threadArgs*)malloc(sizeof(threadArgs));
-
-    if (DEBUG) printf("malloc'd\n");
 
     // Populate the fields of the new record
     newArgs->head = head;
@@ -41,8 +36,6 @@ threadArgs *fillArgs(hashRecord **head, const char *name, uint32_t salary, FILE 
     newArgs->salary = salary;
 
     newArgs->output = output;
-
-    if (DEBUG) printf("abt to exit fill arguments\n");
 
     return newArgs;
 }
@@ -78,20 +71,9 @@ void insert_routine(void *arg)
 
     fprintf(curr_args->output, "WRITE LOCK ACQUIRED\n");
 
-    if (DEBUG)
-        printf("in insert routine\n");
-
     // acquire lock
-    if (DEBUG)
-        printf("segmentation fault after this line\n");
-    
+
     insert(curr_args->head, curr_args->name, curr_args->salary, curr_args->output);
-
-    if (DEBUG)
-        printf("amogus\n");
-
-    if (DEBUG)
-        printf("3\n");
 
     // release lock
     pthread_mutex_unlock(&mutex);
@@ -101,7 +83,6 @@ void insert_routine(void *arg)
 }
 
 void insert(hashRecord **head, const char *name, uint32_t salary, FILE *output) {
-    if (DEBUG) printf("in actual insert\n");
 
     // Calculate hash based on the name
     uint32_t hash = jenkins_one_at_a_time_hash((const uint8_t *)name, strlen(name));
@@ -109,7 +90,6 @@ void insert(hashRecord **head, const char *name, uint32_t salary, FILE *output) 
     //printf("INSERT,%u,%s,%u\n", hash, name, salary);
     //fprintf(output, "INSERT,%u,%s,%u\n", hash, name, salary);
 
-    printf("printed to file\n");
 
     // If the list is empty, make the new record the head
     if (*head == NULL) {
@@ -174,8 +154,7 @@ hashRecord* copyLinkedList(const hashRecord* original) {
 
 bool print(hashRecord *head, FILE *output)
 {
-    //pthread_mutex_lock(&mutex); 
-    //fprintf(output, "READ LOCK ACQUIRED\n");
+    fprintf(output, "READ LOCK ACQUIRED\n");
 
     if (!head)
     {
@@ -217,7 +196,7 @@ bool print(hashRecord *head, FILE *output)
     while (temp != NULL)
     {
         fprintf(output, "%u,%s,%u\n", temp->hash,temp->name, temp->salary);
-        printf("%u,%s,%u\n", temp->hash, temp->name, temp->salary);
+        //printf("%u,%s,%u\n", temp->hash, temp->name, temp->salary);
         temp = temp->next;
     }
 
@@ -229,8 +208,7 @@ bool print(hashRecord *head, FILE *output)
         free(temp);
     }
 
-    //pthread_mutex_lock(&mutex); 
-    //fprintf(output, "READ LOCK RELEASED\n");
+    fprintf(output, "READ LOCK RELEASED\n");
 
     return true;
 }
@@ -258,7 +236,6 @@ hashRecord* search(hashRecord *hashTable, const char *name, FILE *fp)
         return NULL;
     }
 
-    printf("Search- Key found: %u,%s,%u\n", record->hash, record->name, record->salary);
 
     pthread_mutex_unlock(&mutex); // Release mutex lock
     fprintf(fp, "READ LOCK RELEASED\n");
@@ -291,7 +268,6 @@ void delete_real(hashRecord *hashTable, const char *name, FILE * fp)
             }
 
             // Free the memory of the node to be deleted
-            printf("Delete- Deleting: %s\n", curr->name);
             //fprintf(fp, "Delete- Deleting: %s\n", curr->name);
             free(curr);
 

@@ -11,8 +11,6 @@
 #define MAX_COMMAND_SIZE 100
 #define MAX_NAME_SIZE 100
 
-#define DEBUG 0
-
 int main(void)
 {
     FILE *input = fopen("commands.txt", "r");
@@ -22,6 +20,7 @@ int main(void)
     uint32_t salary;
     int i, num_threads;
     threadArgs *curr_args;
+    int count = 0;
 
     if (input == NULL || output == NULL)
     {
@@ -53,8 +52,6 @@ int main(void)
 
     for (i = 0; i < num_threads; i++)
     {
-        if (DEBUG) printf("in for loop\n");
-
         if (fscanf(input, "%[^\n]\n", command) != 1)
         {
             if (feof(input))
@@ -94,13 +91,13 @@ int main(void)
             //fprintf(output, "Inserting %s with salary %d\n", name, salary); // Comment this after you implement insert
 
             // fill arguments here
-            if (DEBUG) printf("abt to fill arguments\n");
 
             curr_args = fillArgs(&head, name, salary, output);
 
             // Call insert
             pthread_create(&threads[i], NULL, insert_routine, (void *)curr_args);
             pthread_join(threads[i], NULL);
+            ++count;
         }
         else if (strcmp(token, "delete") == 0)
         {
@@ -119,6 +116,7 @@ int main(void)
 
             pthread_create(&threads[i], NULL, delete_routine, delete_args);
             pthread_join(threads[i], NULL);
+            count = count + 2;
         }
         else if (strcmp(token, "search") == 0)
         {
@@ -144,14 +142,13 @@ int main(void)
         // Create thread for search operation
         pthread_create(&threads[i], NULL, search_routine, (void *)search_args);
             pthread_join(threads[i], NULL);
-            // Implement search here
+            ++count;
         }
         else if (strcmp(token, "print") == 0)
         {
             // Testing
             //fprintf(output, "Printing hash table\n"); // Comment this after you implement print
             print(head, output);
-            // Implement print here
         }
         else
         {
@@ -159,8 +156,11 @@ int main(void)
         }
         fflush(stdout);
     }
-    
+
+    fprintf(output, "Number of lock acquisitions:  %d\n", count + 1);
+    fprintf(output, "Number of lock releases:  %d\n", count + 1);
     print(head, output);
+    printf("Output written to output.txt\n");
 
     fclose(input);
     fclose(output);
